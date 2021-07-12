@@ -1,54 +1,52 @@
 import React, { useEffect, useState } from "react";
 
-const Coin = () => {
+const usdFormatter = Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+  maximumFractionDigits: 0,
+});
+
+function parseCoinData(data) {
+  if ("coin" in data) {
+    let name = data.coin.id;
+    let pricef = usdFormatter.format(data.coin.price);
+    return (
+      <div>
+        {name}: {pricef}
+      </div>
+    );
+  }
+  return <div>error: failed to parse coin data</div>;
+}
+
+const Coin = (props) => {
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [items, setItems] = useState([]);
+  const [data, setData] = useState([]);
 
-  // Note: the empty deps array [] means
-  // this useEffect will run once
-  // similar to componentDidMount()
   useEffect(() => {
-    fetch("https://api.coinstats.app/public/v1/coins/bitcoin?currency=USD")
+    fetch(
+      `https://api.coinstats.app/public/v1/coins/${props.coinId}?currency=USD`
+    )
       .then((res) => res.json())
       .then(
         (result) => {
           setIsLoaded(true);
-          setItems(result);
+          setData(result);
         },
-        // Note: it's important to handle errors here
-        // instead of a catch() block so that we don't swallow
-        // exceptions from actual bugs in components.
         (error) => {
           setIsLoaded(true);
           setError(error);
         }
       );
-  }, []);
+  }, [props.coinId]);
 
   if (error) {
     return <div>Error: {error.message}</div>;
   } else if (!isLoaded) {
     return <div>Loading...</div>;
   } else {
-    console.log(items);
-    if (items.coin) {
-      let coin = items.coin;
-      let name = coin.id;
-      let price = coin.price;
-      let formatter = Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-        maximumFractionDigits: 0,
-      });
-      let pricef = formatter.format(price);
-      return (
-        <div>
-          {name}: {pricef}
-        </div>
-      );
-    }
-    return <div>?</div>;
+    return parseCoinData(data);
   }
 };
 

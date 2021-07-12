@@ -1,13 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
-
-function FormatNumberLength(num, length) {
-  var r = "" + num;
-  while (r.length < length) {
-    r = "0" + r;
-  }
-  return r;
-}
+import { formatNumberLength } from "../Utils";
 
 const genericOptions = {
   fill: false,
@@ -28,8 +21,8 @@ const genericOptions = {
         
           
           let prevDate = this.getLabelForValue(Math.max(0, val - 24));
-          let datef = `${FormatNumberLength(hours, 2)}:${FormatNumberLength(minutes, 2)}`;
-          if (prevDate.getDay() != date.getDay()) {
+          let datef = `${formatNumberLength(hours, 2)}:${formatNumberLength(minutes, 2)}`;
+          if (prevDate.getDay() !== date.getDay()) {
             datef = date.toLocaleDateString();
           }
 
@@ -105,7 +98,7 @@ const CoinGraph = (props) => {
         let price = point[1];
 
         let date = new Date(point[0] * 1000);
-        let datef = `${date.toLocaleString()}`;
+        // let datef = `${date.toLocaleString()}`;
 
         state.datasets[0].data.push(price);
         state.labels.push(date);
